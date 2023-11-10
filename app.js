@@ -9,4 +9,5 @@ app.listen(port, async () => {
   
   // Créer la base de données et les tables si elles n'existent pas encore
   await createDatabaseAndTables();
+  
 });
