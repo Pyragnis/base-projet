@@ -10,6 +10,9 @@ const pool = new Pool({
   port: 5432,
 });
 
+
+
+
 const setupScript = fs.readFileSync('./setup.sql', 'utf8');
 
 const createDatabaseAndTables = async () => {
