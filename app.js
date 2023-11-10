@@ -2,9 +2,10 @@ const express = require('express');
 const app = express();
 const port = 3000;
 
-app.get('/', (req, res) => {
-  res.send('Bienvenue sur votre serveur Express !');
-});
+app.use(express.json()); // Middleware pour parser les requêtes JSON
+
+const usersRoute = require('./routes/users'); // Importer les routes pour les utilisateurs
+app.use('/users', usersRoute);
 
 app.listen(port, () => {
   console.log(`Le serveur écoute sur le port ${port}`);
