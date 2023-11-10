@@ -1,12 +1,12 @@
 const express = require('express');
+const { createDatabaseAndTables } = require('./db');
+
 const app = express();
 const port = 3000;
 
-app.use(express.json()); // Middleware pour parser les requêtes JSON
-
-const usersRoute = require('./routes/users'); // Importer les routes pour les utilisateurs
-app.use('/users', usersRoute);
-
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Le serveur écoute sur le port ${port}`);
+  
+  // Créer la base de données et les tables si elles n'existent pas encore
+  await createDatabaseAndTables();
 });
