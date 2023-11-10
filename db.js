@@ -15,6 +15,7 @@ const pool = new Pool({
 
 const setupScript = fs.readFileSync('./setup.sql', 'utf8');
 
+
 const createDatabaseAndTables = async () => {
   try {
     const client = await pool.connect();
