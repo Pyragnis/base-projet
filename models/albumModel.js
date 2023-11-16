@@ -1,7 +1,34 @@
+'use strict';
 
-  
-  CREATE TABLE album (
-    album_id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    artist_id INT REFERENCES artist(artist_id)
+const { Model } = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+  class Album extends Model {
+    static associate(models) {
+      Album.belongsTo(models.Artist, { foreignKey: 'artist_id' });
+      Album.hasMany(models.Music, { foreignKey: 'album_id' });
+    }
+  }
+
+  Album.init(
+    {
+      album_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
+      modelName: 'Album',
+      tableName: 'album',
+    }
   );
+
+  return Album;
+};
+

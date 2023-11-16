@@ -1,5 +1,5 @@
 const express = require('express');
-const artistService = require('../services/artistService');
+const artistService = require('../business/artistService');
 
 const router = express.Router();
 
@@ -13,6 +13,5 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Other routes for artists...
 
 module.exports = router;

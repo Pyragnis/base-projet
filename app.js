@@ -1,9 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const artistRoutes = require('./routes/artistRoutes');
-const albumRoutes = require('./routes/albumRoutes');
-const musicRoutes = require('./routes/musicRoutes');
-const config = require('./config');
+const artistRoutes = require('./controllers/artistController');
+const albumRoutes = require('./controllers/albumController');
+const musicRoutes = require('./controllers/musicController');
 
 const app = express();
 const port = 3000;

@@ -1,9 +1,38 @@
-  
-  CREATE TABLE music (
-    music_id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    artist_id INT REFERENCES artist(artist_id),
-    album_id INT REFERENCES album(album_id),
-    file_path VARCHAR(255) NOT NULL
+'use strict';
+
+const { Model } = require('sequelize');
+
+module.exports = (sequelize, DataTypes) => {
+  class Music extends Model {
+    static associate(models) {
+      Music.belongsTo(models.Artist, { foreignKey: 'artist_id' });
+      Music.belongsTo(models.Album, { foreignKey: 'album_id' });
+    }
+  }
+
+  Music.init(
+    {
+      music_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      file_path: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+    },
+    {
+      sequelize,
+      modelName: 'Music',
+      tableName: 'music',
+    }
   );
-  
+
+  return Music;
+};
+
