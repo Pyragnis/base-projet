@@ -1,34 +1,35 @@
+// coverImageModel.js
+
 'use strict';
 
 const { Model, DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  class Music extends Model {
+  class CoverImage extends Model {
     static associate(models) {
-      Music.belongsTo(models.Artist, { foreignKey: 'artist_id' });
-      Music.belongsTo(models.Album, { foreignKey: 'album_id' });
-      Music.hasOne(models.CoverImage, { foreignKey: 'music_id' });
+      CoverImage.belongsTo(models.Album, { foreignKey: 'album_id' });
+      CoverImage.belongsTo(models.Music, { foreignKey: 'music_id' });
     }
   }
 
-  Music.init(
+  CoverImage.init(
     {
-      music_id: {
+      cover_image_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      title: {
+      image_url: {
         type: DataTypes.STRING,
         allowNull: false,
       },
     },
     {
       sequelize,
-      modelName: 'Music',
-      tableName: 'music',
+      modelName: 'CoverImage',
+      tableName: 'cover_image',
     }
   );
 
-  return Music;
+  return CoverImage;
 };
