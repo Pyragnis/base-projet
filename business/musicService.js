@@ -1,8 +1,12 @@
+const sequelize = require('../config/db');
 const musicModel = require('../models/musicModel');
 
 async function getAllMusic() {
   try {
-    const music = await musicModel.getAllMusicFromDatabase();
+    await sequelize.authenticate();
+    await musicModel(sequelize).sync()
+
+    const music = await musicModel(sequelize).findAll();
     return music;
   } catch (error) {
     throw error;
