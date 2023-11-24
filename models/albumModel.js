@@ -1,8 +1,8 @@
 'use strict';
 
-const { Model, DataTypes } = require('sequelize');
+import { Model, DataTypes } from 'sequelize';
 
-module.exports = (sequelize) => {
+export default (sequelize) => {
   class Album extends Model {
     static associate(models) {
       Album.belongsTo(models.Artist, { foreignKey: 'artist_id' });

@@ -1,20 +1,19 @@
-const albumModel = require('../models/albumModel');
-const { Sequelize } = require('sequelize');
-const sequelize = require('../config/db');
+import albumModel from '../models/albumModel.js';
+import { Sequelize } from 'sequelize';
+import {sequelize, connectToDatabase} from '../config/db.js';
 
 async function getAllAlbums() {
   try {
-     await sequelize.authenticate();
-     await albumModel(sequelize).sync()
+    await connectToDatabase()
+    await albumModel(sequelize).sync();
 
-     const albums = await albumModel(sequelize).findAll()
+    const albums = await albumModel(sequelize).findAll();
     return albums;
   } catch (error) {
     throw error;
   }
 }
 
-
-module.exports = {
+export const albumBusinesses =  {
   getAllAlbums,
 };

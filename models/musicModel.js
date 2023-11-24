@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 
-const { Model, DataTypes } = require('sequelize');
+import { Model, DataTypes } from "sequelize";
 
-module.exports = (sequelize) => {
+export default (sequelize) => {
   class Music extends Model {
     static associate(models) {
-      Music.belongsTo(models.Artist, { foreignKey: 'artist_id' });
-      Music.belongsTo(models.Album, { foreignKey: 'album_id' });
-      Music.hasOne(models.CoverImage, { foreignKey: 'music_id' });
+      Music.belongsTo(models.Artist, { foreignKey: "artist_id" });
+      Music.belongsTo(models.Album, { foreignKey: "album_id" });
+      Music.hasOne(models.CoverImage, { foreignKey: "music_id" });
     }
   }
 
@@ -25,8 +25,8 @@ module.exports = (sequelize) => {
     },
     {
       sequelize,
-      modelName: 'Music',
-      tableName: 'music',
+      modelName: "Music",
+      tableName: "music",
     }
   );
 

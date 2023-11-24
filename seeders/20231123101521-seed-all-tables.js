@@ -1,5 +1,5 @@
 'use strict';
-const { faker } = require('@faker-js/faker');
+import { faker } from ('@faker-js/faker');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {

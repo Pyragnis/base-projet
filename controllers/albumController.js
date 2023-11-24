@@ -1,11 +1,11 @@
-const express = require('express');
-const albumService = require('../business/albumService');
+import express from 'express';
+import {albumBusinesses} from '../business/albumService.js';
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const albums = await albumService.getAllAlbums();
+    const albums = await albumBusinesses.getAllAlbums();
     res.json(albums);
   } catch (error) {
     console.error(error);
@@ -14,4 +14,4 @@ router.get('/', async (req, res) => {
 });
 
 
-module.exports = router;
+export default router;

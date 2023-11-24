@@ -1,5 +1,5 @@
-const express = require('express');
-const musicService = require('../business/musicService');
+import express from 'express';
+import musicService from '../business/musicService.js';
 
 const router = express.Router();
 
@@ -13,5 +13,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-
-module.exports = router;
+export default router;

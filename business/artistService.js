@@ -1,12 +1,10 @@
-
-const artistModel = require('../models/artistModel');
-const { Sequelize } = require('sequelize');
-const sequelize = require('../config/db');
-
+import artistModel from '../models/artistModel.js';
+import { Sequelize } from 'sequelize';
+import {sequelize, connectToDatabase} from '../config/db.js';
 
 async function getAllArtists() {
   try {
-    await sequelize.authenticate();
+    await connectToDatabase();
     await artistModel(sequelize).sync();
 
     const artists = await artistModel(sequelize).findAll();
@@ -17,7 +15,6 @@ async function getAllArtists() {
   }
 }
 
-
-module.exports = {
+export const  artistBusinesses =  {
   getAllArtists,
 };

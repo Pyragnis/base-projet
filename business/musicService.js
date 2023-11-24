@@ -1,10 +1,10 @@
-const sequelize = require('../config/db');
-const musicModel = require('../models/musicModel');
+import {sequelize, connectToDatabase} from '../config/db.js';
+import musicModel from '../models/musicModel.js';
 
 async function getAllMusic() {
   try {
-    await sequelize.authenticate();
-    await musicModel(sequelize).sync()
+    await connectToDatabase()
+    await musicModel(sequelize).sync();
 
     const music = await musicModel(sequelize).findAll();
     return music;
@@ -13,7 +13,6 @@ async function getAllMusic() {
   }
 }
 
-
-module.exports = {
+export default {
   getAllMusic,
 };
