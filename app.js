@@ -3,9 +3,11 @@ import bodyParser from "body-parser";
 import albumController from "./controllers/albumController.js";
 import artistController from "./controllers/artistController.js";
 import musicController from "./controllers/musicController.js";
+import 'dotenv/config'
+import art from './art.js'
 
 const app = express();
-const port = 3000;
+const port = process.env.DB_PORT;
 
 // Middleware
 app.use(bodyParser.json());
@@ -18,5 +20,5 @@ app.use("/albums", albumController);
 app.use("/music", musicController);
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(art)
 });
