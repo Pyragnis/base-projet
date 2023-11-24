@@ -14,6 +14,19 @@ async function getAllAlbums() {
   }
 }
 
+async function addAlbums(data){
+    try {
+        await connectToDatabase();
+        await albumModel(sequelize).sync()
+
+        const addedresponse = await albumModel(sequelize).create(data)
+        return addedresponse;        
+    } catch (error) {
+        throw error
+    }
+}
+
 export const albumBusinesses =  {
   getAllAlbums,
+  addAlbums
 };

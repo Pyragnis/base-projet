@@ -10,7 +10,7 @@ const art = `
  ▒ ▒ ░░     ░     ░ ░     ░ ░   ░ ░ ░ ▒    ░   ░   ░ ░     ▒ ▒ ░░  
  ░ ░        ░  ░    ░  ░    ░  ░    ░ ░      ░             ░ ░     
  ░ ░                                                       ░ ░     
- server is running on ${process.env.DB_PORT} ...
+ server is running on ${process.env.SERVER_PORT} ...
 
 `;
 

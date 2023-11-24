@@ -22,6 +22,10 @@ export default (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      artist_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     },
     {
       sequelize,

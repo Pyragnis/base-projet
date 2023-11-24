@@ -7,7 +7,7 @@ import 'dotenv/config'
 import art from './art.js'
 
 const app = express();
-const port = process.env.DB_PORT;
+const port = process.env.SERVER_PORT;
 
 // Middleware
 app.use(bodyParser.json());
