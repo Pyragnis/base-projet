@@ -3,6 +3,7 @@ import bodyParser from "body-parser";
 import albumController from "./controllers/albumController.js";
 import artistController from "./controllers/artistController.js";
 import musicController from "./controllers/musicController.js";
+import coverController from './controllers/coverController.js'
 import 'dotenv/config'
 import art from './art.js'
 
@@ -18,6 +19,8 @@ app.use("/public", express.static("public"));
 app.use("/artists", artistController);
 app.use("/albums", albumController);
 app.use("/music", musicController);
+app.use('/cover',coverController)
+
 
 app.listen(port, () => {
   console.log(art)
