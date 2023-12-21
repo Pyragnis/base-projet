@@ -1,4 +1,4 @@
-import { CoverImage, Album } from "../models/models.js";
+import { CoverImage } from "../models/models.js";
 import { sequelize, connectToDatabase } from "../config/db.js";
 import s3 from "../aws-config/s3.js";
 
@@ -8,15 +8,17 @@ async function getAllCovers() {
     await CoverImage.sync();
 
     const covers = await CoverImage.findAll();
-    
+
     const coversWithUrls = await Promise.all(
       covers.map(async (cover) => {
         const url = await s3.getFile(cover.url);
         return { ...cover.dataValues, url };
       })
     );
+
     return coversWithUrls;
   } catch (error) {
+    console.error("Error in getAllCovers:", error);
     throw error;
   }
 }
@@ -26,7 +28,7 @@ async function getCoverById(id) {
     await connectToDatabase();
     await CoverImage.sync();
 
-    const cover = await CoverImage.findAll({
+    const cover = await CoverImage.findOne({
       where: { cover_id: id },
     });
 
@@ -34,10 +36,11 @@ async function getCoverById(id) {
       throw new Error(`Cover with id ${id} not found.`);
     }
 
-    const url = await s3.getFile(cover[0].dataValues.url);
+    const url = await s3.getFile(cover.url);
 
     return { cover, url };
   } catch (error) {
+    console.error("Error in getCoverById:", error);
     throw error;
   }
 }
@@ -56,9 +59,8 @@ async function addImage(file, data) {
     if (uploadResult.cle) {
       const dbData = {
         url: uploadResult.cle,
-        artist_id: parseInt(data.artist_id),
-        music_id: parseInt(data.music_id),
-        album_id: parseInt(data.album_id),
+        music_id: data.music_id ? parseInt(data.music_id) : null,
+        album_id: data.album_id? parseInt(data.album_id) : null,
       };
 
       const cover = await CoverImage.create(dbData);
@@ -75,7 +77,7 @@ async function addImage(file, data) {
 
 async function updateCover(data) {
   try {
-    await connectToDatabase();
+    connectToDatabase();
     await CoverImage.sync();
 
     const updatedResponse = await CoverImage.update(data, {
@@ -84,6 +86,7 @@ async function updateCover(data) {
 
     return updatedResponse;
   } catch (error) {
+    console.error("Error in updateCover:", error);
     throw error;
   }
 }
@@ -99,11 +102,12 @@ async function deleteCover(id) {
 
     return deletedResponse;
   } catch (error) {
+    console.error("Error in deleteCover:", error);
     throw error;
   }
 }
 
-export default  {
+export default {
   getAllCovers,
   getCoverById,
   addImage,

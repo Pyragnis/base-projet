@@ -9,10 +9,9 @@ router.get("/", async (req, res) => {
     res.json(artists);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 router.get("/:id", async (req, res) => {
   try {
@@ -26,35 +25,33 @@ router.get("/:id", async (req, res) => {
     res.json(artist);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 router.post("/addartist", async (req, res) => {
   try {
     const { name, bio } = req.body;
 
-    const creationData = {
+    const artistData = {
       name: name,
-      bio: bio
+      bio: bio,
     };
 
-    const createArtist = await artistService.addArtist(creationData);
+    const createArtist = await artistService.addArtist(artistData);
 
-    res.status(200).send(createArtist);
+    res.status(201).json(createArtist);
   } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-
 router.post("/addMultipleArtists", async (req, res) => {
   try {
-    const artistsData = req.body; // Assuming the request body contains an array of artist data
+    const artistsData = req.body;
 
-    if (!artistsData || !Array.isArray(artistsData) || artistsData.length === 0) {
+    if (!Array.isArray(artistsData) || artistsData.length === 0) {
       return res.status(400).json({ error: "Invalid artist data provided." });
     }
 
@@ -63,38 +60,48 @@ router.post("/addMultipleArtists", async (req, res) => {
     res.status(201).json(addedArtists);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-
-router.put("/update", async (req, res) => {
+router.put("/update/:id", async (req, res) => {
   try {
-    const { name } = req.body;
+    const artistId = req.params.id;
+    const { name, bio } = req.body;
 
-    const creationData = {
+    if (!artistId || !name) {
+      return res.status(400).json({ error: "Missing required data for update." });
+    }
+
+    const updateData = {
       name: name,
+      bio: bio
     };
 
-    const updateartist = await artistService.updateArtistdata(creationData);
+    const updatedArtist = await artistService.updateArtistdata(artistId, updateData);
 
-    res.status(200).send(updateartist);
+    if (!updatedArtist) {
+      return res.status(404).json({ error: `Artist with ID ${artistId} not found` });
+    }
+
+    res.status(200).json(updatedArtist);
   } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-router.delete("/delete", async (req, res) => {
+
+router.delete("/delete/:id", async (req, res) => {
   try {
-    const { id } = req.query;
+    const  artist_id  = req.params.id;
 
-    const deleteartst = await artistService.deleteArtist(id);
+    const deleteArtist = await artistService.deleteArtist(artist_id);
 
-    res.status(200).send({ message: `Artist with id ${id} has been deleted` });
+    res.status(200).json({ message: `Artist with id ${artist_id} has been deleted` });
   } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

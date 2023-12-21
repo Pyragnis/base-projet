@@ -13,11 +13,9 @@ router.get("/", async (req, res) => {
   }
 });
 
-
-
-router.get("/getbyid", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
-    const {id} = req.query
+    const { id } = req.params;
     const albums = await albumBusinesses.getAlbumById(id);
     res.json(albums);
   } catch (error) {
@@ -26,62 +24,81 @@ router.get("/getbyid", async (req, res) => {
   }
 });
 
-
-router.post("/addalbum", async (req, res) => {
+router.post("/add", async (req, res) => {
   try {
     const { title, release_date, genre, description, artist_id } = req.body;
 
     const creationData = {
-      title: title,
-      release_date: release_date,
-      genre: genre,
-      description: description,
-      artist_id: artist_id,
+      title,
+      release_date,
+      genre,
+      description,
+      artist_id,
     };
 
     const createAlbum = await albumBusinesses.addAlbum(creationData);
 
     const updatedAlbums = await albumBusinesses.getAllAlbums();
 
-    res.status(200).json(updatedAlbums);
+    res.status(200).json(createAlbum);
   } catch (error) {
     console.error(error);
     res.status(500).send(error);
   }
 });
 
-
-
-router.delete("/delete/", async (req, res) => {
+router.post("/addMultiple", async (req, res) => {
   try {
-    const { id } = req.query;
-    console.log(req.query)
+    const albumsData = req.body;
 
+    if (!Array.isArray(albumsData) || albumsData.length === 0) {
+      return res.status(400).json({ error: "Invalid album data provided." });
+    }
+
+    const addedAlbums = await albumBusinesses.addMultipleAlbums(albumsData);
+
+    // const updatedAlbums = await albumBusinesses.getAllAlbums();
+
+    res.status(201).json(addedAlbums);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+
+router.delete("/delete/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
     const deleteAlbum = await albumBusinesses.deleteAlbum(id);
 
     res.status(200).send(deleteAlbum);
   } catch (error) {
+    console.error(error);
     res.status(500).send(error);
   }
 });
 
-router.put("/update", async (req, res) => {
+router.put("/update/:id", async (req, res) => {
   try {
+    const { id } = req.params;
     const { title, artist_id } = req.body;
 
     console.log(artist_id);
 
-    const creationData = {
-      title: title,
-      artist_id: artist_id,
+    const updateData = {
+      title,
+      artist_id,
     };
 
-    const updateAlbum = await albumBusinesses.updateAlbums(creationData);
+    const updateAlbum = await albumBusinesses.updateAlbum(id, updateData);
 
     res.status(200).send(updateAlbum);
   } catch (error) {
+    console.error(error);
     res.status(500).send(error);
   }
 });
+
 
 export default router;

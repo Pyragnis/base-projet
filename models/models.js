@@ -13,22 +13,11 @@ export const CoverImage = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    artist_id: {
-      type: DataTypes.INTEGER,
-    },
     music_id: {
       type: DataTypes.INTEGER,
     },
     album_id: {
       type: DataTypes.INTEGER,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      allowNull: false,
     },
   },
   {
@@ -62,22 +51,11 @@ export const Album = sequelize.define(
     artist_id: {
       type: DataTypes.INTEGER,
     },
-    created_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    updated_at: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
   },
   {
     sequelize,
     modelName: "Album",
     tableName: "album",
-    timestamps: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at",
   }
 );
 
@@ -128,6 +106,7 @@ export const Music = sequelize.define(
       },
       onUpdate: "CASCADE",
       onDelete: "CASCADE",
+      allowNull: true
     },
     album_id: {
       type: DataTypes.INTEGER,
@@ -137,6 +116,7 @@ export const Music = sequelize.define(
       },
       onUpdate: "CASCADE",
       onDelete: "CASCADE",
+      allowNull: true,
     },
     listening_count: {
       type: DataTypes.INTEGER,
@@ -151,12 +131,16 @@ export const Music = sequelize.define(
 );
 
 Music.belongsTo(Artist, { foreignKey: "artist_id", as: "Artist" });
-Music.belongsTo(Album, { foreignKey: "album_id", as: "Album", allowNull: true });
+Music.belongsTo(Album, {
+  foreignKey: "album_id",
+  as: "Album",
+  allowNull: true,
+});
 Music.hasOne(CoverImage, { foreignKey: "music_id", as: "CoverImage" });
 
 Album.belongsTo(Artist, { foreignKey: "artist_id" });
 Album.hasMany(Music, { foreignKey: "album_id" });
 
-CoverImage.belongsTo(Artist, { foreignKey: "artist_id" });
+// CoverImage.belongsTo(Artist, { foreignKey: "artist_id" });
 CoverImage.belongsTo(Music, { foreignKey: "music_id", as: "Music" });
 CoverImage.belongsTo(Album, { foreignKey: "album_id" });

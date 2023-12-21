@@ -33,6 +33,7 @@ module.exports = {
         },
         onUpdate: 'CASCADE',
         onDelete: 'SET NULL', // Updated to SET NULL for optional relationship
+        allowNull: true, // Added to explicitly allow null
       },
       listening_count: {
         type: Sequelize.INTEGER,

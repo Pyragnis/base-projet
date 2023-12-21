@@ -9,6 +9,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 /************************Get**************/
+
 router.get("/", async (req, res) => {
   try {
     const music = await musicService.getAllMusic();
@@ -19,22 +20,10 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/getbytitle", async (req, res) => {
-  try {
-    const { title } = req.body;
-    const music = await musicService.getMusicByTitle(title);
-    console.log(music);
-    res.json(music);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-router.get("/getbyid/:id", async (req, res) => {
+// Updated Get Music by ID route
+router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    console.log(id, "here I am---------");
     const music = await musicService.getMusicById(id);
     console.log(music);
     res.json(music);
@@ -44,48 +33,52 @@ router.get("/getbyid/:id", async (req, res) => {
   }
 });
 
-/************************post**************/
+/************************Post**************/
 
-router.post("/addmusic", upload.single("songfile"), async (req, res) => {
+router.post("/addmusic", upload.single("song"), async (req, res) => {
   try {
     const audioFile = req.file;
-    const audioData = req.body;
+    const { name, album_id, artist_id } = req.body; // Use req.body for JSON data
 
-
-    console.log(audioFile, "fil--------e")
-    console.log(audioData, "audiodata")
-
+    console.log(audioFile, "file");
+    console.log(req.body, "audio data");
 
     if (!audioFile) {
       return res.status(400).json({ error: "Missing audio file." });
     }
 
-    const name = audioData.name;
-    const albumId =  audioData.album_id;
-    const artistId = audioData.artist_id;
-
-    if (!name || !albumId || !artistId) {
+    if (!name) {
       return res.status(400).json({ error: "Missing required form data." });
     }
 
-    console.log(audioFile);
-    console.log(audioData);
+    if(album_id){
+      const uploadMusic = await musicService.addMusic(audioFile, {
+        name,
+        album_id: album_id, 
+      });
+      res.status(200).send(uploadMusic);
+    }
 
-    const uploadMusic = await musicService.addMusic(audioFile, {
-      name,
-      albumId,
-      artistId,
-    });
+    if(artist_id){
+      const uploadMusic = await musicService.addMusic(audioFile, {
+        name,
+        artist_id: artist_id,
+      });
+      res.status(200).send(uploadMusic);
+    }
+    
 
-    res.status(200).send(uploadMusic);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 });
-router.delete("/delete", async (req, res) => {
+
+/************************Delete**************/
+
+router.delete("/delete/:id", async (req, res) => {
   try {
-    const { id } = req.query;
+    const id  = req.params.id;
 
     console.log(id);
     const deleteMusic = await musicService.deleteMusic(id);

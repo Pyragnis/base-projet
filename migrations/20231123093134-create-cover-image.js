@@ -1,3 +1,5 @@
+// migrations/20231123093134-create-cover-image.js
+
 'use strict';
 
 module.exports = {
@@ -11,15 +13,6 @@ module.exports = {
       url: {
         type: Sequelize.STRING,
         allowNull: false,
-      },
-      artist_id: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'artist',
-          key: 'artist_id',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
       music_id: {
         type: Sequelize.INTEGER,

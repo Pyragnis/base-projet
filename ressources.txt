@@ -1,0 +1,102 @@
+Based on the provided code snippets for your routes, here's the list of endpoints along with the HTTP methods:
+
+1. **Get All Albums:**
+   - Endpoint: `http://localhost:5432/`
+   - Method: `GET`
+
+2. **Get Album by ID:**
+   - Endpoint: `http://localhost:5432/:id`
+   - Method: `GET`
+
+3. **Add Album:**
+   - Endpoint: `http://localhost:5432/addalbum`
+   - Method: `POST`
+
+4. **Delete Album:**
+   - Endpoint: `http://localhost:5432/delete/:id`
+   - Method: `DELETE`
+
+5. **Update Album:**
+   - Endpoint: `http://localhost:5432/update/:id`
+   - Method: `PUT`
+
+
+
+Sure, based on the provided code, here is the list of endpoints:
+
+1. **GET All Music:**
+   - Endpoint: `http://localhost:5432/music/`
+   - Method: `GET`
+
+2. **GET Music by ID:**
+   - Endpoint: `http://localhost:5432/music/getbyid/:id`
+   - Method: `GET`
+
+3. **POST Add Music:**
+   - Endpoint: `http://localhost:5432/music/addmusic`
+   - Method: `POST`
+   - Note: Expects a file named "songfile" in the form data along with other fields.
+
+4. **DELETE Delete Music:**
+   - Endpoint: `http://localhost:5432/music/delete`
+   - Method: `DELETE`
+   - Note: Expects the `id` parameter in the query string.
+
+These are the endpoints corresponding to the routes in your provided code. Please ensure that your server is running on `http://localhost:5432` and that the necessary configurations are set up. Adjust the base URL or port if your server is running on a different address.
+
+
+Here are the endpoints based on the provided code:
+
+1. **GET All Artists:**
+   - Endpoint: `http://localhost:5432/artists/`
+   - Method: `GET`
+
+2. **GET Artist by ID:**
+   - Endpoint: `http://localhost:5432/artists/:id`
+   - Method: `GET`
+
+3. **POST Add Artist:**
+   - Endpoint: `http://localhost:5432/artists/addartist`
+   - Method: `POST`
+   - Request Body: JSON object with `name` and `bio` fields.
+
+4. **POST Add Multiple Artists:**
+   - Endpoint: `http://localhost:5432/artists/addMultipleArtists`
+   - Method: `POST`
+   - Request Body: JSON array containing objects with `name` and `bio` fields for each artist.
+
+5. **PUT Update Artist:**
+   - Endpoint: `http://localhost:5432/artists/update`
+   - Method: `PUT`
+   - Request Body: JSON object with `id` and `name` fields.
+
+6. **DELETE Delete Artist:**
+   - Endpoint: `http://localhost:5432/artists/delete`
+   - Method: `DELETE`
+   - Query Parameter: `id` (e.g., `http://localhost:5432/artists/delete?id=1`)
+
+Please adjust the base URL or port if your server is running on a different address.
+
+
+
+
+
+
+Certainly! Here are the routes with the base URL included:
+
+1. **Get all covers:**
+   - Route: `GET http://localhost:5432/cover/`
+
+2. **Get cover by ID:**
+   - Route: `GET http://localhost:5432/cover/getbyid/:id`
+
+3. **Add image:**
+   - Route: `POST http://localhost:5432/cover/addimage`
+
+4. **Delete cover:**
+   - Route: `DELETE http://localhost:5432/cover/delete?id=:id`
+
+5. **Update cover:**
+   - Route: `PUT http://localhost:5432/cover/update`
+
+Please replace `:id` with the actual ID you want to use in the routes. Additionally, make sure to handle the data appropriately in the `update` route by providing the necessary parameters in the request body.

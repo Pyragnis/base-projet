@@ -6,11 +6,18 @@ import { parseBuffer } from "music-metadata";
 async function getAllMusic() {
   try {
     await connectToDatabase();
+
     const musicList = await Music.findAll({
       include: [
         { model: Artist, as: "Artist" },
-        { model: CoverImage, as: "CoverImage" },
-        { model: Album, as: "Album" },
+        {
+          model: CoverImage,
+          as: "CoverImage",
+          include: [
+            { model: Album, as: "Album" }, // Include Album for music linked to an album
+            { model: Music, as: "Music" }, // Include Music for music not linked to an album
+          ],
+        },
       ],
     });
 
@@ -18,11 +25,23 @@ async function getAllMusic() {
       musicList.map(async (music) => {
         const url = await s3.getFile(music.dataValues.file_path);
 
-        const coverImageUrl = music.CoverImage
-          ? await s3.getFile(music.CoverImage.dataValues.url)
-          : null;
+        const coverImageInfo = music.CoverImage;
 
-        return { ...music.dataValues, url, coverImageUrl };
+        let coverImageUrl = null;
+        let linkedAlbumInfo = null;
+
+        if (coverImageInfo) {
+          coverImageUrl = await s3.getFile(coverImageInfo.dataValues.url);
+
+          if (coverImageInfo.Album) {
+            linkedAlbumInfo = {
+              album_id: coverImageInfo.Album.album_id,
+              title: coverImageInfo.Album.title,
+            };
+          }
+        }
+
+        return { ...music.dataValues, url, coverImageUrl, linkedAlbumInfo };
       })
     );
 
@@ -34,6 +53,7 @@ async function getAllMusic() {
     throw error;
   }
 }
+
 
 async function getMusicByTitle(title) {
   try {
@@ -79,7 +99,6 @@ async function getMusicById(music_id) {
 
     const url = await s3.getFile(music.dataValues.file_path);
 
-    // Include the CoverImage URL
     const coverImageUrl = music.CoverImage
       ? await s3.getFile(music.CoverImage.dataValues.url)
       : null;
@@ -96,6 +115,9 @@ async function addMusic(audioFileObj, additionalData) {
     await connectToDatabase();
     await Music.sync();
 
+
+    console.log(additionalData, "hello bro")
+
     const extensionIndex = audioFileObj.originalname.lastIndexOf(".");
     const title = audioFileObj.originalname.substring(0, extensionIndex);
     const ext = audioFileObj.originalname.substring(extensionIndex + 1);
@@ -108,9 +130,12 @@ async function addMusic(audioFileObj, additionalData) {
       const dbData = {
         title,
         file_path: uploadResult.cle,
-        album_id: parseInt(additionalData.albumId),
-        artist_id: parseInt(additionalData.artistId),
+        album_id: additionalData.album_id?  parseInt(additionalData.album_id) : null,
+        artist_id: additionalData.artist_id ?  parseInt(additionalData.artist_id) : null,
       };
+
+
+      console.log(dbData)
 
       const music = await Music.create(dbData);
       return music;
