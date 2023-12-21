@@ -8,7 +8,14 @@ async function getAllCovers() {
     await CoverImage.sync();
 
     const covers = await CoverImage.findAll();
-    return covers;
+    
+    const coversWithUrls = await Promise.all(
+      covers.map(async (cover) => {
+        const url = await s3.getFile(cover.url);
+        return { ...cover.dataValues, url };
+      })
+    );
+    return coversWithUrls;
   } catch (error) {
     throw error;
   }

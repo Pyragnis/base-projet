@@ -34,8 +34,7 @@ router.get("/getbytitle", async (req, res) => {
 router.get("/getbyid/:id", async (req, res) => {
   try {
     const id = req.params.id;
-
-    console.log(id, "here iam---------")
+    console.log(id, "here I am---------");
     const music = await musicService.getMusicById(id);
     console.log(music);
     res.json(music);
@@ -47,41 +46,53 @@ router.get("/getbyid/:id", async (req, res) => {
 
 /************************post**************/
 
-router.post("/addmusic", upload.single("song"), async (req, res) => {
+router.post("/addmusic", upload.single("songfile"), async (req, res) => {
   try {
-    const audiofile = req.file;
+    const audioFile = req.file;
+    const audioData = req.body;
 
-    console.log(audiofile, "99e8u8e8u8u8u");
-    const audiodata = req.body;
 
-    console.log(audiodata, 'cii poisisii')
+    console.log(audioFile, "fil--------e")
+    console.log(audioData, "audiodata")
 
-    if (!audiofile || !audiodata) {
-      return res.status(400).json({ error: "Missing audio file or data." });
+
+    if (!audioFile) {
+      return res.status(400).json({ error: "Missing audio file." });
     }
 
-    console.log(audiofile);
-    console.log(audiodata);
+    const name = audioData.name;
+    const albumId =  audioData.album_id;
+    const artistId = audioData.artist_id;
 
-    const uploadmusic = await musicService.addmusic(audiofile, audiodata);
+    if (!name || !albumId || !artistId) {
+      return res.status(400).json({ error: "Missing required form data." });
+    }
 
-    res.status(200).send(uploadmusic);
+    console.log(audioFile);
+    console.log(audioData);
+
+    const uploadMusic = await musicService.addMusic(audioFile, {
+      name,
+      albumId,
+      artistId,
+    });
+
+    res.status(200).send(uploadMusic);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 });
-
 router.delete("/delete", async (req, res) => {
   try {
     const { id } = req.query;
 
     console.log(id);
-    const deletemusic = await musicService.deleteMusic(id);
-    res, status(200).send(deletemusic);
+    const deleteMusic = await musicService.deleteMusic(id);
+    res.status(200).send(deleteMusic);
   } catch (error) {
     console.log(error);
-    res.status(500).send(error)
+    res.status(500).send(error);
   }
 });
 

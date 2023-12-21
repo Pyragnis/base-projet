@@ -19,38 +19,34 @@ async function getAllAlbums() {
 
     const albumsWithUrls = await Promise.all(
       albums.map(async (album) => {
+        const albumCoverImage = await CoverImage.findOne({
+          where: { album_id: album.album_id },
+        });
+
+        const albumCoverImageUrl = albumCoverImage
+          ? await s3.getFile(albumCoverImage.dataValues.url)
+          : null;
+
         const musicList = await Promise.all(
           album.Music.map(async (music) => {
-            // Fetch CoverImage for the Music
             const coverImage = await CoverImage.findOne({
               where: { music_id: music.music_id },
             });
 
-            // Fetch URL for the CoverImage of the Music
             const coverImageUrl = coverImage
               ? await s3.getFile(coverImage.dataValues.url)
               : null;
 
-            // Fetch URL for the Album cover image
-            const albumCoverImageUrl = album.cover_id
-              ? await s3.getFile(album.dataValues.url) // Replace "url" with the actual column name for the cover image URL in Album
-              : null;
-
-            // Fetch URL for the Music file_path
             const musicUrl = await s3.getFile(music.dataValues.file_path);
 
-            // Return Music data with URLs
             return {
               ...music.dataValues,
               coverImageUrl,
-              albumCoverImageUrl,
               musicUrl,
             };
           })
         );
-
-        // Return Album data with Music list containing URLs
-        return { ...album.dataValues, Music: musicList };
+        return { ...album.dataValues, Music: musicList, albumCoverImageUrl };
       })
     );
 
@@ -60,7 +56,6 @@ async function getAllAlbums() {
     throw error;
   }
 }
-
 
 async function addAlbum(data) {
   try {
@@ -77,17 +72,14 @@ async function addAlbum(data) {
 async function getAlbumById(album_id) {
   try {
     await connectToDatabase();
-    await Music.sync();
-    await CoverImage.sync();
-    await Artist.sync();
     await Album.sync();
 
     const album = await Album.findOne({
       where: { album_id: album_id },
       include: [
         {
-          model: Artist,
-          as: "Artist",
+          model: Music,
+          as: "Music",
         },
       ],
     });
@@ -96,9 +88,34 @@ async function getAlbumById(album_id) {
       throw new Error(`Album with id ${album_id} not found.`);
     }
 
-    const url = await s3.getFile(album.dataValues.file_path);
+    const albumCoverImage = await CoverImage.findOne({
+      where: { album_id: album_id },
+    });
 
-    return { album, url };
+    const albumCoverImageUrl = albumCoverImage
+      ? await s3.getFile(albumCoverImage.dataValues.url)
+      : null;
+
+    const musicList = await Promise.all(
+      album.Music.map(async (music) => {
+        const coverImage = await CoverImage.findOne({
+          where: { music_id: music.music_id },
+        });
+
+        const coverImageUrl = coverImage
+          ? await s3.getFile(coverImage.dataValues.url)
+          : null;
+
+        const musicUrl = await s3.getFile(music.dataValues.file_path);
+        return {
+          ...music.dataValues,
+          coverImageUrl,
+          musicUrl,
+        };
+      })
+    );
+
+    return { ...album.dataValues, Music: musicList, albumCoverImageUrl };
   } catch (error) {
     console.error("Error in getAlbumById:", error);
     throw error;
@@ -125,15 +142,24 @@ async function deleteAlbum(album_id) {
     await connectToDatabase();
     await Album.sync();
 
-    const deletedResponse = await Album.destroy({
+    const deletedAlbum = await Album.findByPk(album_id);
+
+    if (!deletedAlbum) {
+      throw new Error(`Album with id ${album_id} not found.`);
+    }
+
+    await Music.destroy({
       where: { album_id: album_id },
     });
+
+    const deletedResponse = await deletedAlbum.destroy();
 
     return deletedResponse;
   } catch (error) {
     throw error;
   }
 }
+
 
 export default {
   getAllAlbums,

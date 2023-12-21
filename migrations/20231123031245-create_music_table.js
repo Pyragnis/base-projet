@@ -32,7 +32,12 @@ module.exports = {
           key: 'album_id',
         },
         onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
+        onDelete: 'SET NULL', // Updated to SET NULL for optional relationship
+      },
+      listening_count: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -44,7 +49,9 @@ module.exports = {
       },
     });
   },
+
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.removeColumn('music', 'listening_count');
     await queryInterface.dropTable('music');
   },
 };

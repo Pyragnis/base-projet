@@ -14,14 +14,19 @@ async function getAllMusic() {
       ],
     });
 
-    console.log(musicList, "00000000000");
-
     const musicWithUrls = await Promise.all(
       musicList.map(async (music) => {
         const url = await s3.getFile(music.dataValues.file_path);
-        return { ...music.dataValues, url };
+
+        const coverImageUrl = music.CoverImage
+          ? await s3.getFile(music.CoverImage.dataValues.url)
+          : null;
+
+        return { ...music.dataValues, url, coverImageUrl };
       })
     );
+
+    console.log(musicWithUrls);
 
     return musicWithUrls;
   } catch (error) {
@@ -37,6 +42,11 @@ async function getMusicByTitle(title) {
 
     const music = await Music.findAll({
       where: { title: title },
+      include: [
+        { model: Artist, as: "Artist" },
+        { model: CoverImage, as: "CoverImage" },
+        { model: Album, as: "Album" },
+      ],
     });
 
     if (!music) {
@@ -65,16 +75,23 @@ async function getMusicById(music_id) {
       throw new Error(`Song with id ${music_id} not found.`);
     }
 
+    await music.increment("listening_count");
+
     const url = await s3.getFile(music.dataValues.file_path);
 
-    return { music, url };
+    // Include the CoverImage URL
+    const coverImageUrl = music.CoverImage
+      ? await s3.getFile(music.CoverImage.dataValues.url)
+      : null;
+
+    return { music: { ...music.dataValues, coverImageUrl }, url };
   } catch (error) {
     console.error("Error in getMusicById:", error);
     throw error;
   }
 }
 
-async function addmusic(audioFileObj, additionalData) {
+async function addMusic(audioFileObj, additionalData) {
   try {
     await connectToDatabase();
     await Music.sync();
@@ -91,8 +108,8 @@ async function addmusic(audioFileObj, additionalData) {
       const dbData = {
         title,
         file_path: uploadResult.cle,
-        album_id: parseInt(additionalData.album_id),
-        artist_id: parseInt(additionalData.artist_id),
+        album_id: parseInt(additionalData.albumId),
+        artist_id: parseInt(additionalData.artistId),
       };
 
       const music = await Music.create(dbData);
@@ -102,7 +119,7 @@ async function addmusic(audioFileObj, additionalData) {
       throw new Error("Failed to add music. Please try again.");
     }
   } catch (error) {
-    console.error("Error in addmusic:", error);
+    console.error("Error in addMusic:", error);
     throw error;
   }
 }
@@ -112,27 +129,34 @@ async function deleteMusic(musicId) {
     await connectToDatabase();
     await Music.sync();
 
-    const musicToDelete = await Music.findByPk(musicId);
+    const musicToDelete = await Music.findByPk(musicId, {
+      include: [
+        { model: Artist, as: "Artist" },
+        { model: CoverImage, as: "CoverImage" },
+        { model: Album, as: "Album" },
+      ],
+    });
 
     if (!musicToDelete) {
       throw new Error(`Music with ID ${musicId} not found.`);
     }
 
-    const filepath = musicToDelete.dataValues.file_path;
-    await s3.deleteFile(filepath);
+    // const filepath = musicToDelete.dataValues.file_path;
+    // await s3.deleteFile(filepath);
 
     await musicToDelete.destroy();
 
-    return `Music with ID ${musicId} deleted successfully.`;
+    return `Music with ID ${musicId} deleted successfully, along with associated data.`;
   } catch (error) {
     console.error("Error in deleteMusic:", error);
     throw error;
   }
 }
 
+
 export default {
   getAllMusic,
-  addmusic,
+  addMusic,
   deleteMusic,
   getMusicByTitle,
   getMusicById,

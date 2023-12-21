@@ -18,19 +18,18 @@ router.get("/", async (req, res) => {
 router.get("/getbyid", async (req, res) => {
   try {
     const {id} = req.query
-    const albums = await albumBusinesses.getAlbumByid(id);
+    const albums = await albumBusinesses.getAlbumById(id);
     res.json(albums);
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    res.status(500).send(error);
   }
 });
+
 
 router.post("/addalbum", async (req, res) => {
   try {
     const { title, release_date, genre, description, artist_id } = req.body;
-
-    console.log(artist_id);
 
     const creationData = {
       title: title,
@@ -42,18 +41,23 @@ router.post("/addalbum", async (req, res) => {
 
     const createAlbum = await albumBusinesses.addAlbum(creationData);
 
-    res.status(200).send(createAlbum);
+    const updatedAlbums = await albumBusinesses.getAllAlbums();
+
+    res.status(200).json(updatedAlbums);
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).send(error);
   }
 });
 
-router.delete("/delete", async (req, res) => {
+
+
+router.delete("/delete/", async (req, res) => {
   try {
     const { id } = req.query;
+    console.log(req.query)
 
-    const deleteAlbum = await albumBusinesses.deleteAlbums(id);
+    const deleteAlbum = await albumBusinesses.deleteAlbum(id);
 
     res.status(200).send(deleteAlbum);
   } catch (error) {

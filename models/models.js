@@ -75,9 +75,9 @@ export const Album = sequelize.define(
     sequelize,
     modelName: "Album",
     tableName: "album",
-    timestamps: true, // Enable timestamps
-    createdAt: "created_at", // Customize the column name if needed
-    updatedAt: "updated_at", // Customize the column name if needed
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
   }
 );
 
@@ -92,6 +92,9 @@ export const Artist = sequelize.define(
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    bio: {
+      type: DataTypes.TEXT,
     },
   },
   {
@@ -135,6 +138,10 @@ export const Music = sequelize.define(
       onUpdate: "CASCADE",
       onDelete: "CASCADE",
     },
+    listening_count: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
   },
   {
     modelName: "Music",
@@ -144,12 +151,8 @@ export const Music = sequelize.define(
 );
 
 Music.belongsTo(Artist, { foreignKey: "artist_id", as: "Artist" });
-Music.belongsTo(Album, { foreignKey: "album_id", as: "Album" });
+Music.belongsTo(Album, { foreignKey: "album_id", as: "Album", allowNull: true });
 Music.hasOne(CoverImage, { foreignKey: "music_id", as: "CoverImage" });
-
-Artist.hasMany(Album, { foreignKey: "artist_id" });
-Artist.hasMany(Music, { foreignKey: "artist_id" });
-Artist.hasOne(CoverImage, { foreignKey: "artist_id" });
 
 Album.belongsTo(Artist, { foreignKey: "artist_id" });
 Album.hasMany(Music, { foreignKey: "album_id" });

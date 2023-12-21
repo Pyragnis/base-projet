@@ -6,12 +6,14 @@ import musicController from "./controllers/musicController.js";
 import coverController from './controllers/coverController.js'
 import 'dotenv/config'
 import art from './art.js'
+import cors from 'cors'
 
 const app = express();
 const port = process.env.SERVER_PORT;
 
 // Middleware
 app.use(bodyParser.json());
+app.use(cors())
 app.use("/uploads", express.static("uploads"));
 app.use("/public", express.static("public"));
 
