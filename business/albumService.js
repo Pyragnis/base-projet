@@ -22,16 +22,44 @@ async function getAllAlbums() {
 
     const albumsWithUrls = await Promise.all(
       albums.map(async (album) => {
-        const musicList = album.Music.map((music) => {
-          return {
-            ...music.dataValues,
-          };
+        // Fetch the cover image for the album
+        const albumCoverImage = await CoverImage.findOne({
+          where: { album_id: album.album_id },
         });
+
+        const albumCover = albumCoverImage
+          ? await s3.getFile(albumCoverImage.dataValues.url)
+          : null;
+
+        const musicList = await Promise.all(
+          album.Music.map(async (music) => {
+            // Fetch cover image for each music
+            const coverImage = await CoverImage.findOne({
+              where: { music_id: music.music_id },
+            });
+
+            const coverImageUrl = coverImage
+              ? await s3.getFile(coverImage.dataValues.url)
+              : null;
+
+            // Use the music's file path for musicUrl, if available
+            const musicUrl = music.dataValues.file_path
+              ? await s3.getFile(music.dataValues.file_path)
+              : null;
+
+            return {
+              ...music.dataValues,
+              coverImageUrl,
+              musicUrl,
+            };
+          })
+        );
 
         return {
           ...album.dataValues,
           Artist: album.Artist.dataValues,
           Music: musicList,
+          albumCover,
         };
       })
     );
@@ -42,6 +70,7 @@ async function getAllAlbums() {
     throw error;
   }
 }
+
 
 
 
@@ -79,7 +108,6 @@ async function addMultipleAlbums(albumsData) {
   }
 }
 
-
 async function getAlbumById(album_id) {
   try {
     await connectToDatabase();
@@ -113,6 +141,7 @@ async function getAlbumById(album_id) {
 
     const musicList = await Promise.all(
       album.Music.map(async (music) => {
+        // Fetch cover image for each music
         const coverImage = await CoverImage.findOne({
           where: { music_id: music.music_id },
         });
@@ -121,7 +150,11 @@ async function getAlbumById(album_id) {
           ? await s3.getFile(coverImage.dataValues.url)
           : null;
 
-        const musicUrl = await s3.getFile(music.dataValues.file_path);
+        // Use the music's file path for musicUrl, if available
+        const musicUrl = music.dataValues.file_path
+          ? await s3.getFile(music.dataValues.file_path)
+          : null;
+
         return {
           ...music.dataValues,
           coverImageUrl,
@@ -130,7 +163,12 @@ async function getAlbumById(album_id) {
       })
     );
 
-    return { ...album.dataValues, Artist: album.Artist.dataValues, Music: musicList, albumCoverImageUrl };
+    return {
+      ...album.dataValues,
+      Artist: album.Artist.dataValues,
+      Music: musicList,
+      albumCoverImageUrl,
+    };
   } catch (error) {
     console.error("Error in getAlbumById:", error);
     throw error;
