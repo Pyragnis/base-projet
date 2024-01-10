@@ -7,10 +7,10 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "crypto";
 
-const AWS_ACCESS_KEY_ID = "AKIA4XITKHRTD2OIYOFL";
-const AWS_SECRET_ACCESS_KEY = "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";
+const AWS_ACCESS_KEY_ID = "AKIASBKWWOUZDF2UYFFE";
+const AWS_SECRET_ACCESS_KEY = "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";
 const AWS_REGION = "eu-west-3";
-const AWS_BUCKET_NAME = "yellowfy";
+const AWS_BUCKET_NAME = "yellowfy2";
 
 const s3 = new S3Client({
   credentials: {

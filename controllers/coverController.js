@@ -53,6 +53,7 @@ router.post("/add", upload.single("image"), async (req, res) => {
     }
 
     if (album_id) {
+      console.log(album_id)
       const imageData = {
         music_id: null,
         album_id,
@@ -104,13 +105,13 @@ router.post(
 
 /************************delete***********************/
 
-router.delete("/delete", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
-    const { id } = req.query;
+    const id = req.params.id;
 
     console.log(id);
     const deletemusic = await coverService.deleteCover(id);
-    res.status(200).send(deletemusic);
+    res.sendStatus(200)
   } catch (error) {
     console.log(error);
     res.status(500).send(error);

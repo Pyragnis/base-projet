@@ -40,6 +40,10 @@ router.post("/addmusic", upload.single("song"), async (req, res) => {
     const audioFile = req.file;
     const { name, album_id, artist_id } = req.body; // Use req.body for JSON data
 
+
+    console.log(album_id, "helloooooooooooooooop")
+
+
     console.log(audioFile, "file");
     console.log(req.body, "audio data");
 
@@ -50,6 +54,7 @@ router.post("/addmusic", upload.single("song"), async (req, res) => {
     if (!name) {
       return res.status(400).json({ error: "Missing required form data." });
     }
+
 
     if(album_id){
       const uploadMusic = await musicService.addMusic(audioFile, {
@@ -74,7 +79,7 @@ router.post("/addmusic", upload.single("song"), async (req, res) => {
   }
 });
 
-/************************Delete**************/
+/*********************Delete**************/
 
 router.delete("/delete/:id", async (req, res) => {
   try {

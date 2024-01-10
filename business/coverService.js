@@ -60,7 +60,7 @@ async function addImage(file, data) {
       const dbData = {
         url: uploadResult.cle,
         music_id: data.music_id ? parseInt(data.music_id) : null,
-        album_id: data.album_id? parseInt(data.album_id) : null,
+        album_id: data.album_id ? parseInt(data.album_id) : null,
       };
 
       const cover = await CoverImage.create(dbData);
@@ -96,10 +96,21 @@ async function deleteCover(id) {
     await connectToDatabase();
     await CoverImage.sync();
 
+    const coverTodelete = await CoverImage.findOne({
+      where: { cover_id: id },
+    });
+    if (!coverTodelete) {
+      throw new Error(`Cover with cover_id${id} not found`);
+    }
+
+    const filepath = coverTodelete.dataValues.url;
+
+    await s3.deleteFile(filepath);
+
     const deletedResponse = await CoverImage.destroy({
       where: { cover_id: id },
     });
-
+    
     return deletedResponse;
   } catch (error) {
     console.error("Error in deleteCover:", error);

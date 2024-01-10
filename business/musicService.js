@@ -128,7 +128,7 @@ async function addMusic(audioFileObj, additionalData) {
 
     if (uploadResult.cle) {
       const dbData = {
-        title,
+        title: additionalData.name,
         file_path: uploadResult.cle,
         album_id: additionalData.album_id?  parseInt(additionalData.album_id) : null,
         artist_id: additionalData.artist_id ?  parseInt(additionalData.artist_id) : null,
@@ -166,8 +166,8 @@ async function deleteMusic(musicId) {
       throw new Error(`Music with ID ${musicId} not found.`);
     }
 
-    // const filepath = musicToDelete.dataValues.file_path;
-    // await s3.deleteFile(filepath);
+    const filepath = musicToDelete.dataValues.file_path;
+    await s3.deleteFile(filepath);
 
     await musicToDelete.destroy();
 

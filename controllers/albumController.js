@@ -36,6 +36,9 @@ router.post("/add", async (req, res) => {
       artist_id,
     };
 
+
+    console.log(title, release_date, genre, description, artist_id)
+
     const createAlbum = await albumBusinesses.addAlbum(creationData);
 
     const updatedAlbums = await albumBusinesses.getAllAlbums();
