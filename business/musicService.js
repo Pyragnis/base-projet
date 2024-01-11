@@ -3,6 +3,7 @@ import { Music, Album, Artist, CoverImage } from "../models/models.js";
 import s3 from "../aws-config/s3.js";
 import { parseBuffer } from "music-metadata";
 
+
 async function getAllMusic() {
   try {
     await connectToDatabase();
@@ -10,38 +11,30 @@ async function getAllMusic() {
     const musicList = await Music.findAll({
       include: [
         { model: Artist, as: "Artist" },
-        {
-          model: CoverImage,
-          as: "CoverImage",
-          include: [
-            { model: Album, as: "Album" }, // Include Album for music linked to an album
-            { model: Music, as: "Music" }, // Include Music for music not linked to an album
-          ],
-        },
+        { model: Album, as: "Album" } // Only include Album data
       ],
     });
 
     const musicWithUrls = await Promise.all(
       musicList.map(async (music) => {
-        const url = await s3.getFile(music.dataValues.file_path);
+        const musicUrl = await s3.getFile(music.dataValues.file_path);
+        let albumCoverImageUrl = null;
 
-        const coverImageInfo = music.CoverImage;
-
-        let coverImageUrl = null;
-        let linkedAlbumInfo = null;
-
-        if (coverImageInfo) {
-          coverImageUrl = await s3.getFile(coverImageInfo.dataValues.url);
-
-          if (coverImageInfo.Album) {
-            linkedAlbumInfo = {
-              album_id: coverImageInfo.Album.album_id,
-              title: coverImageInfo.Album.title,
-            };
+        if (music.Album) {
+          const coverImageRecord = await CoverImage.findOne({ 
+            where: { album_id: music.Album.album_id } 
+          });
+          if (coverImageRecord) {
+            albumCoverImageUrl = await s3.getFile(coverImageRecord.url);
           }
         }
 
-        return { ...music.dataValues, url, coverImageUrl, linkedAlbumInfo };
+        return { 
+          ...music.dataValues, 
+          url: musicUrl, 
+          albumCoverImageUrl,
+          Album: music.Album ? { ...music.Album.dataValues, coverImageUrl: albumCoverImageUrl } : null
+        };
       })
     );
 
@@ -53,6 +46,8 @@ async function getAllMusic() {
     throw error;
   }
 }
+
+
 
 
 async function getMusicByTitle(title) {
@@ -79,15 +74,13 @@ async function getMusicByTitle(title) {
     throw error;
   }
 }
-
 async function getMusicById(music_id) {
   try {
     const music = await Music.findOne({
       where: { music_id },
       include: [
         { model: Artist, as: "Artist" },
-        { model: CoverImage, as: "CoverImage" },
-        { model: Album, as: "Album" },
+        { model: Album, as: "Album" } // Only include Album data
       ],
     });
 
@@ -97,18 +90,33 @@ async function getMusicById(music_id) {
 
     await music.increment("listening_count");
 
-    const url = await s3.getFile(music.dataValues.file_path);
+    const musicUrl = await s3.getFile(music.dataValues.file_path);
+    let albumCoverImageUrl = null;
 
-    const coverImageUrl = music.CoverImage
-      ? await s3.getFile(music.CoverImage.dataValues.url)
-      : null;
+    // If the music is linked to an album, fetch the album's cover image
+    if (music.Album) {
+      const coverImageRecord = await CoverImage.findOne({ 
+        where: { album_id: music.Album.album_id } 
+      });
+      if (coverImageRecord) {
+        albumCoverImageUrl = await s3.getFile(coverImageRecord.url);
+      }
+    }
 
-    return { music: { ...music.dataValues, coverImageUrl }, url };
+    return { 
+      music: { 
+        ...music.dataValues, 
+        url: musicUrl, 
+        albumCoverImageUrl,
+        Album: music.Album ? { ...music.Album.dataValues, coverImageUrl: albumCoverImageUrl } : null
+      }
+    };
   } catch (error) {
     console.error("Error in getMusicById:", error);
     throw error;
   }
 }
+
 
 async function addMusic(audioFileObj, additionalData) {
   try {
