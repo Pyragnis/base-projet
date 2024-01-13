@@ -7,6 +7,7 @@ import artistController from "./controllers/artistController.js";
 import musicController from "./controllers/musicController.js";
 import coverController from "./controllers/coverController.js";
 import roomController from "./controllers/roomController.js";
+import art from './art.js'
 
 import "dotenv/config";
 import cors from "cors";
@@ -96,7 +97,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const port = process.env.SERVER_PORT || 3000;
+const port =  5000;
 server.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  console.log(art)
 });
