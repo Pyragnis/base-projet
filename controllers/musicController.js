@@ -25,7 +25,7 @@ router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const music = await musicService.getMusicById(id);
-    console.log(music);
+    // console.log(music);
     res.json(music);
   } catch (error) {
     console.error(error);
@@ -41,11 +41,11 @@ router.post("/addmusic", upload.single("song"), async (req, res) => {
     const { name, album_id, artist_id } = req.body; // Use req.body for JSON data
 
 
-    console.log(album_id, "helloooooooooooooooop")
+    // console.log(album_id, "helloooooooooooooooop")
 
 
-    console.log(audioFile, "file");
-    console.log(req.body, "audio data");
+    // console.log(audioFile, "file");
+    // console.log(req.body, "audio data");
 
     if (!audioFile) {
       return res.status(400).json({ error: "Missing audio file." });

@@ -24,9 +24,9 @@ const randomName = (bytes = 32) => crypto.randomBytes(bytes).toString("hex");
 
 const uploadFile = async (audioBuffer, additionalData, ext) => {
   try {
-    console.log(ext, "************************")
+    // console.log(ext, "************************")
     const filename = randomName();
-    console.log(filename + `.${ext}`);
+    // console.log(filename + `.${ext}`);
     const cle = filename + `.${ext}`
     const params = {
       Bucket: AWS_BUCKET_NAME,

@@ -23,7 +23,7 @@ router.get("/getbyid/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const cover = await coverService.getCoverById(id);
-    console.log(cover);
+    // console.log(cover);
     res.status(200).json(cover);
   } catch (error) {
     console.error(error);

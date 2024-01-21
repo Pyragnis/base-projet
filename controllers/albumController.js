@@ -37,7 +37,7 @@ router.post("/add", async (req, res) => {
     };
 
 
-    console.log(title, release_date, genre, description, artist_id)
+    // console.log(title, release_date, genre, description, artist_id)
 
     const createAlbum = await albumBusinesses.addAlbum(creationData);
 
@@ -87,7 +87,7 @@ router.put("/update/:id", async (req, res) => {
     const { id } = req.params;
     const { title, artist_id } = req.body;
 
-    console.log(artist_id);
+    // console.log(artist_id);
 
     const updateData = {
       title,

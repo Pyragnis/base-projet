@@ -38,7 +38,7 @@ async function getAllMusic() {
       })
     );
 
-    console.log(musicWithUrls);
+    // console.log(musicWithUrls);
 
     return musicWithUrls;
   } catch (error) {
@@ -124,7 +124,7 @@ async function addMusic(audioFileObj, additionalData) {
     await Music.sync();
 
 
-    console.log(additionalData, "hello bro")
+    // console.log(additionalData, "hello bro")
 
     const extensionIndex = audioFileObj.originalname.lastIndexOf(".");
     const title = audioFileObj.originalname.substring(0, extensionIndex);
@@ -143,7 +143,7 @@ async function addMusic(audioFileObj, additionalData) {
       };
 
 
-      console.log(dbData)
+      // console.log(dbData)
 
       const music = await Music.create(dbData);
       return music;
