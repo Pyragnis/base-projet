@@ -170,12 +170,14 @@ async function deleteMusic(musicId) {
       ],
     });
 
+    console.log(musicToDelete)
+
     if (!musicToDelete) {
       throw new Error(`Music with ID ${musicId} not found.`);
     }
 
     const filepath = musicToDelete.dataValues.file_path;
-    await s3.deleteFile(filepath);
+    // await s3.deleteFile(filepath);
 
     await musicToDelete.destroy();
 
